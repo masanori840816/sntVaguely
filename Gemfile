@@ -1,0 +1,15 @@
+source 'https://rubygems.org'
+
+ruby '2.2.0'
+
+gem 'activesupport'
+gem 'activerecord'
+gem 'coffee-script'
+gem 'rake'
+gem 'sass'
+gem 'sinatra'
+gem 'sinatra-activerecord'
+gem 'sinatra-base'
+gem 'sinatra-reloader'
+gem 'slim'
+gem 'sqlite3'

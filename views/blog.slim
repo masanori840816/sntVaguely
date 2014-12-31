@@ -1,0 +1,20 @@
+main.main
+  - @aryContents.each do |content|
+    article#main_title = content.contentstitle
+    article#main_body = content.contents
+
+  input#btn type="button" onclick="showalert()" value="Alert"
+
+article.side
+  table
+    thread
+      tr
+        th ID
+        th 題名
+        th 本文
+    //tbody
+    //  - @aryContents.each do |content|
+      //  tr
+          //td = content.id
+          //td = content.contentstitle
+          //td = content.contents
