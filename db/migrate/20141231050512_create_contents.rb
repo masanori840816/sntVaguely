@@ -1,21 +1,21 @@
 class CreateContents < ActiveRecord::Migration
   def change
-    create_table :contents, id: false do |tblcontents|
-      tblcontents.string :contentsid
-      tblcontents.primary_key :contentsid
-      tblcontents.string :contentstitle
-      tblcontents.string :contents
-      tblcontents.timestamps
+    create_table :posts, id: false do |tblpost|
+      tblpost.string :post_id
+      tblpost.primary_key :post_id
+      tblpost.string :post_title
+      tblpost.string :post
+      tblpost.timestamps
     end
     create_table :tags, id: false do |tbltags|
-      tbltags.string :tagid
-      tbltags.primary_key :tagid
-      tbltags.string :tagname
+      tbltags.string :tag_id
+      tbltags.primary_key :tag_id
+      tbltags.string :tag_name
       tbltags.timestamps
     end
     create_table :taglinks do |tbltaglinks|
-      tbltaglinks.integer :contentsid
-      tbltaglinks.integer :tagid
+      tbltaglinks.integer :post_id
+      tbltaglinks.integer :tag_id
     end
   end
 end

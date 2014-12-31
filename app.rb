@@ -8,12 +8,9 @@ require 'slim'
 require './models/dbAccessers'
 
 class MainApp < Sinatra::Base
-  acrContent = Content.new
-
   get '/' do
-    #blcContents.getContents
-    @aryContents = Content.all
-    #@aryFullContents = Content.joins(:
+    @aryPosts = Post.all
+    @aryTags = Tag.joins(:taglinks)
     slim :blog
   end
   get '/css/stylesheet.css' do

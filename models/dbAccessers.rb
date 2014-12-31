@@ -4,9 +4,13 @@ require 'sinatra/activerecord'
 ActiveRecord::Base.configurations = YAML.load_file('db/database.yml')
 ActiveRecord::Base.establish_connection(:development)
 
-class Content < ActiveRecord::Base
+class Post < ActiveRecord::Base
 end
 class Tag < ActiveRecord::Base
+  has_many :taglinks
+  accepts_nested_attributes_for :taglinks
 end
 class Taglink < ActiveRecord::Base
+  #belongs_to :post
+  belongs_to :tag
 end

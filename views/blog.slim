@@ -1,7 +1,9 @@
 main.main
-  - @aryContents.each do |content|
-    article#main_title = content.contentstitle
-    article#main_body = content.contents
+  - @aryPosts.each do |post|
+    article#main_title = post.post_title
+    article#main_body = post.post
+  - @aryTags.each do |tag|
+    article#main_tags = tag.tag_name
 
   input#btn type="button" onclick="showalert()" value="Alert"
 

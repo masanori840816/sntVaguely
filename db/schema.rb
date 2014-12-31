@@ -13,20 +13,20 @@
 
 ActiveRecord::Schema.define(version: 20141231050512) do
 
-  create_table "contents", primary_key: "contentsid", force: :cascade do |t|
-    t.string   "contentstitle"
-    t.string   "contents"
+  create_table "posts", primary_key: "post_id", force: :cascade do |t|
+    t.string   "post_title"
+    t.string   "post"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "taglinks", force: :cascade do |t|
-    t.integer "contentsid"
-    t.integer "tagid"
+    t.integer "post_id"
+    t.integer "tag_id"
   end
 
-  create_table "tags", primary_key: "tagid", force: :cascade do |t|
-    t.string   "tagname"
+  create_table "tags", primary_key: "tag_id", force: :cascade do |t|
+    t.string   "tag_name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
