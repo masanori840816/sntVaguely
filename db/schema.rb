@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20141231050512) do
 
-  create_table "contents", force: :cascade do |t|
+  create_table "contents", primary_key: "contentsid", force: :cascade do |t|
     t.string   "contentstitle"
     t.string   "contents"
     t.datetime "created_at"
@@ -21,11 +21,11 @@ ActiveRecord::Schema.define(version: 20141231050512) do
   end
 
   create_table "taglinks", force: :cascade do |t|
-    t.string "contentsid"
-    t.string "tagid"
+    t.integer "contentsid"
+    t.integer "tagid"
   end
 
-  create_table "tags", force: :cascade do |t|
+  create_table "tags", primary_key: "tagid", force: :cascade do |t|
     t.string   "tagname"
     t.datetime "created_at"
     t.datetime "updated_at"

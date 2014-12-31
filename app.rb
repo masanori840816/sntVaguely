@@ -13,6 +13,7 @@ class MainApp < Sinatra::Base
   get '/' do
     #blcContents.getContents
     @aryContents = Content.all
+    #@aryFullContents = Content.joins(:
     slim :blog
   end
   get '/css/stylesheet.css' do
