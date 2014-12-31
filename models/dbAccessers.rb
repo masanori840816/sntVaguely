@@ -8,7 +8,6 @@ class Post < ActiveRecord::Base
 end
 class Tag < ActiveRecord::Base
   has_many :taglinks
-  accepts_nested_attributes_for :taglinks
 end
 class Taglink < ActiveRecord::Base
   #belongs_to :post

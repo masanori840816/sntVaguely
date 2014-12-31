@@ -10,7 +10,8 @@ require './models/dbAccessers'
 class MainApp < Sinatra::Base
   get '/' do
     @aryPosts = Post.all
-    @aryTags = Tag.joins(:taglinks)
+
+    @aryTags = Tag.joins(:taglinks).select(:tag_name, :post_id)
     slim :blog
   end
   get '/css/stylesheet.css' do

@@ -2,8 +2,10 @@ main.main
   - @aryPosts.each do |post|
     article#main_title = post.post_title
     article#main_body = post.post
-  - @aryTags.each do |tag|
-    article#main_tags = tag.tag_name
+    - postid = post.post_id
+    - @aryTags.each do |tag|
+      - if tag.post_id == postid
+        article#main_tags = tag.tag_name
 
   input#btn type="button" onclick="showalert()" value="Alert"
 
