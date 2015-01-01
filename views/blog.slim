@@ -1,11 +1,15 @@
 main.main
   - @aryPosts.each do |post|
     article#main_title = post.post_title
+
+    article#main_tagframe
+      - postid = post.post_id
+      - @aryTags.each do |tag|
+        - if tag.post_id == postid
+          - linkurl = "/tag/" + tag.tag_id.to_s
+          a#main_tag href=linkurl =tag.tag_name
+
     article#main_body = post.post
-    - postid = post.post_id
-    - @aryTags.each do |tag|
-      - if tag.post_id == postid
-        article#main_tags = tag.tag_name
 
   input#btn type="button" onclick="showalert()" value="Alert"
 
