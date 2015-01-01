@@ -12,6 +12,13 @@ main.main
     article#main_body = post.post
     article#main_updatedate = post.updated_at
 
+  article#main_pagerframe
+    - intPagerNum = 1
+    - @intPagerCount.times do
+      - pageurl = "?page=" + intPagerNum.to_s
+      a#main_pager href=pageurl =intPagerNum
+      - intPagerNum += 1
+
 article.side
   ul#side_linklist
     li#side_linktitle タグ
