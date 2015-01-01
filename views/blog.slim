@@ -13,9 +13,15 @@ main.main
     article#main_updatedate = post.updated_at
 
 article.side
-  table
-    thread
-      tr
-        th ID
-        th 題名
-        th 本文
+  ul#side_linklist
+    li#side_linktitle タグ
+    - @aryAllTags.each do |allTag|
+      - tagUrl = "/tag/" + allTag.tag_id.to_s
+      li
+        a#side_link href=tagUrl =allTag.tag_name
+  ul#side_linklist
+    li#side_linktitle 最近の投稿
+    - @aryCurrentPosts.each do |currentPost|
+      - postUrl = "/post/"
+      li
+        a#side_link href=postUrl =currentPost.post_title

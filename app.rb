@@ -10,13 +10,13 @@ require './models/dbAccessers'
 class MainApp < Sinatra::Base
   get '/' do
     @aryPosts = Post.all.order(post_id: 'desc')
-    @aryTags = getLinkedTags
+    getLinkedTags
     slim :blog
   end
   get '/tag/:name' do
     puts "tag"
     @aryPosts = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc')
-    @aryTags = getLinkedTags
+    getLinkedTags
     slim :blog
   end
   get '/css/stylesheet.css' do
@@ -27,7 +27,8 @@ class MainApp < Sinatra::Base
     coffee :'js/javascript'
   end
   def getLinkedTags()
-    aryLinkedTag = Tag.joins(:taglinks).select(:tag_name, :post_id, :tag_id)
-    aryLinkedTag
+    @aryTags = Tag.joins(:taglinks).select(:tag_name, :post_id, :tag_id)
+    @aryAllTags = Tag.all.order(tag_name: 'asc')
+    @aryCurrentPosts = Post.select(:post_id, :post_title).order(updated_at: 'desc')
   end
 end
