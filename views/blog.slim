@@ -10,8 +10,7 @@ main.main
           a#main_tag href=linkurl =tag.tag_name
 
     article#main_body = post.post
-
-  input#btn type="button" onclick="showalert()" value="Alert"
+    article#main_updatedate = post.updated_at
 
 article.side
   table
@@ -20,9 +19,3 @@ article.side
         th ID
         th 題名
         th 本文
-    //tbody
-    //  - @aryContents.each do |content|
-      //  tr
-          //td = content.id
-          //td = content.contentstitle
-          //td = content.contents

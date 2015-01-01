@@ -9,13 +9,13 @@ require './models/dbAccessers'
 
 class MainApp < Sinatra::Base
   get '/' do
-    @aryPosts = Post.all
+    @aryPosts = Post.all.order(post_id: 'desc')
     @aryTags = getLinkedTags
     slim :blog
   end
   get '/tag/:name' do
     puts "tag"
-    @aryPosts = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]})
+    @aryPosts = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc')
     @aryTags = getLinkedTags
     slim :blog
   end
