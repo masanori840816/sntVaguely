@@ -18,7 +18,7 @@ class MainApp < Sinatra::Base
   get '/' do
     intPageOffsetNum = getPageOffset(params[:page])
 
-    getPagerCount
+    getPagerCount(Post.count)
     @aryPosts = Post.all.order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
     getLinkedTags
     slim :blog
@@ -26,8 +26,8 @@ class MainApp < Sinatra::Base
   get '/tag/:name' do
     intPageOffsetNum = getPageOffset(params[:page])
 
-    getPagerCount
     @aryPosts = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
+    getPagerCount(@aryPosts.count)
     getLinkedTags
     slim :blog
   end
@@ -47,9 +47,15 @@ class MainApp < Sinatra::Base
     # 最近の投稿から10件取得する.
     @aryCurrentPosts = Post.select(:post_id, :post_title).order(updated_at: 'desc').limit(10)
   end
-  def getPagerCount()
+  def getPagerCount(postCount)
     # ページャー数を取得する.
-    @intPagerCount = (Post.count.to_f / POST_LIMIT_COUNT.to_f).ceil
+    @intPagerCount = (postCount.to_f / POST_LIMIT_COUNT.to_f).ceil
+
+    if @intPagerCount <= 1
+      @isPagerEnable = false
+    else
+      @isPagerEnable = true
+    end
   end
   def getPageOffset(pageNum)
     # 遷移したページ数に合致した記事を表示するための、オフセット値を取得する.

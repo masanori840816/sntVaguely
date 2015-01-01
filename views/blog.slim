@@ -14,10 +14,13 @@ main.main
 
   article#main_pagerframe
     - intPagerNum = 1
-    - @intPagerCount.times do
-      - pageurl = "?page=" + intPagerNum.to_s
-      a#main_pager href=pageurl =intPagerNum
-      - intPagerNum += 1
+    - if @isPagerEnable
+      - @intPagerCount.times do
+        - pageurl = "?page=" + intPagerNum.to_s
+        a#main_pager href=pageurl =intPagerNum
+        - intPagerNum += 1
+    - else
+      a#main_pager =intPagerNum
 
 article.side
   ul#side_linklist
