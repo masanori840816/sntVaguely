@@ -1,9 +1,11 @@
-main.main
+main#main
   - @aryPosts.each do |post|
-    article#main_title = post.post_title
+    - postid = post.post_id
+    article#main_titleframe
+      - posturl = "/article/" + postid.to_s
+      a#main_title href=posturl =post.post_title
 
     article#main_tagframe
-      - postid = post.post_id
       - @aryTags.each do |tag|
         - if tag.post_id == postid
           - linkurl = "/tag/" + tag.tag_id.to_s
@@ -21,17 +23,3 @@ main.main
         - intPagerNum += 1
     - else
       a#main_pager =intPagerNum
-
-article.side
-  ul#side_linklist
-    li#side_linktitle タグ
-    - @aryAllTags.each do |allTag|
-      - tagUrl = "/tag/" + allTag.tag_id.to_s
-      li
-        a#side_link href=tagUrl =allTag.tag_name
-  ul#side_linklist
-    li#side_linktitle 最近の投稿
-    - @aryCurrentPosts.each do |currentPost|
-      - postUrl = "/post/"
-      li
-        a#side_link href=postUrl =currentPost.post_title

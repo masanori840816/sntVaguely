@@ -13,7 +13,6 @@ POST_LIMIT_COUNT = 5
 class MainApp < Sinatra::Base
 
   intPageOffsetNum = 0
-  intPostCount = 0
 
   get '/' do
     intPageOffsetNum = getPageOffset(params[:page])
@@ -22,6 +21,17 @@ class MainApp < Sinatra::Base
     @aryPosts = Post.all.order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
     getLinkedTags
     slim :blog
+  end
+  get '/article/:name' do
+    @aryArticle = Post.where(post_id: params[:name])
+    @aryTags = Tag.joins(:taglinks).select(:tag_name, :post_id, :tag_id).where(taglinks: {post_id: params[:name]})
+
+    # TODO: あとで統合
+    @aryAllTags = Tag.all.order(tag_name: 'asc')
+    # 最近の投稿から10件取得する.
+    @aryCurrentPosts = Post.select(:post_id, :post_title).order(updated_at: 'desc').limit(10)
+
+    slim :article
   end
   get '/tag/:name' do
     intPageOffsetNum = getPageOffset(params[:page])

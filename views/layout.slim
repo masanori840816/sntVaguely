@@ -9,3 +9,17 @@ html
     header
       a.header_title href="/" Vaguely
     == yield
+
+    article.side
+      ul#side_linklist
+        li#side_linktitle タグ
+        - @aryAllTags.each do |allTag|
+          - tagUrl = "/tag/" + allTag.tag_id.to_s
+          li
+            a#side_link href=tagUrl =allTag.tag_name
+      ul#side_linklist
+        li#side_linktitle 最近の投稿
+        - @aryCurrentPosts.each do |currentPost|
+          - articleUrl = "/article/" + currentPost.post_id.to_s
+          li
+            a#side_link href=articleUrl =currentPost.post_title

@@ -1,0 +1,13 @@
+main#main
+  - @aryArticle.each do |article|
+    - postid = article.post_id
+    article#main_titleframe = article.post_title
+
+    article#main_tagframe
+      - @aryTags.each do |tag|
+        - if tag.post_id == postid
+          - linkurl = "/tag/" + tag.tag_id.to_s
+          a#main_tag href=linkurl =tag.tag_name
+
+    article#main_body = article.post
+    article#main_updatedate = article.updated_at
