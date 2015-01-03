@@ -1,18 +1,14 @@
 main#main
-  - @aryPosts.each do |post|
-    - postid = post.post_id
+  - for i in 0..@intCount
     article#main_titleframe
-      - posturl = "/article/" + postid.to_s
-      a#main_title href=posturl =post.post_title
+      a#main_title href==@aryPostUrl[i] =@aryPostTitle[i]
 
     article#main_tagframe
-      - @aryTags.each do |tag|
-        - if tag.post_id == postid
-          - linkurl = "/tag/" + tag.tag_id.to_s
-          a#main_tag href=linkurl =tag.tag_name
+      - for t in 0..@aryTagNames[i].count - 1
+        a#main_tag href=@aryTagUrls[i][t] =@aryTagNames[i][t]
 
-    article#main_body = post.post
-    article#main_updatedate = post.updated_at
+    article#main_body =@aryShortPost[i]
+    article#main_updatedate = @aryUpdateDate[i]
 
   article#main_pagerframe
     - intPagerNum = 1
