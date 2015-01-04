@@ -1,4 +1,4 @@
-require 'coffee-script'
+require 'rss/maker'
 require 'sass'
 require 'sinatra'
 require 'sinatra/base'
@@ -13,6 +13,8 @@ POST_URL_DIR = "/article/"
 TAG_URL_DIR = "/tag/"
 POST_SHORT_LIMIT_SIZE = 300
 CURRENT_POST_LIMIT_COUNT = 10
+SITE_URL = 'http://localhost:9292'
+RSS_LIMIT_SIZE = 10
 
 class MainApp < Sinatra::Base
 
@@ -57,9 +59,31 @@ class MainApp < Sinatra::Base
   get '/css/stylesheet.css' do
     sass :'css/stylesheet'
   end
+  get '/feed' do
+    # RSSフィードの出力.
+    rss = RSS::Maker.make("2.0") do |rss|
+      rss.channel.about = SITE_URL + '/rss.xml'
+      rss.channel.title = "Vaguely"
+      rss.channel.description = "なんとなくやってみたことを書き残します"
+      rss.channel.link = SITE_URL
+      rss.channel.language = "ja"
 
-  get '/js/javascript.js' do
-    coffee :'js/javascript'
+      rss.items.do_sort = true
+      rss.items.max_size = RSS_LIMIT_SIZE
+
+      # TODO: 日付・時間違いの投稿を増やし、SQLで並び替えの必要があるかを検証.
+      aryPosts = Post.all.limit(RSS_LIMIT_SIZE)
+      aryPosts.each do |post|
+        i= rss.items.new_item
+        i.title = post.post_title
+        i.link = SITE_URL + POST_URL_DIR + post.post_id.to_s
+        i.description = post.post
+        i.date = post.updated_at
+      end
+    end
+
+    content_type "application/xml"
+    rss.to_s
   end
   def getShortPosts(aryPosts)
     # 記事一覧表示用の投稿データを取得する.
