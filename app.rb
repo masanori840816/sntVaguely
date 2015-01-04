@@ -12,6 +12,7 @@ POST_LIMIT_COUNT = 5
 POST_URL_DIR = "/article/"
 TAG_URL_DIR = "/tag/"
 POST_SHORT_LIMIT_SIZE = 300
+CURRENT_POST_LIMIT_COUNT = 10
 
 class MainApp < Sinatra::Base
 
@@ -27,8 +28,20 @@ class MainApp < Sinatra::Base
     slim :blog
   end
   get '/article/:name' do
-    @aryArticle = Post.where(post_id: params[:name])
-    @aryTags = Tag.joins(:taglinks).select(:tag_name, :post_id, :tag_id).where(taglinks: {post_id: params[:name]})
+    # 記事IDからタイトルなどを検索し、詳細ページに表示する.
+    aryArticle = Post.where(post_id: params[:name])
+    aryArticle.each do |article|
+      @strTitle = article.post_title
+      @strPost = article.post
+      @datUpdateDate = article.updated_at
+    end
+    @aryTagUrl = []
+    @aryTagName = []
+    aryTags = Tag.joins(:taglinks).select(:tag_name, :post_id, :tag_id).where(taglinks: {post_id: params[:name]})
+    aryTags.each do |tag|
+      @aryTagUrl << TAG_URL_DIR + tag.tag_id.to_s
+      @aryTagName << tag.tag_name
+    end
     getRightColumnData
     slim :article
   end
@@ -55,7 +68,6 @@ class MainApp < Sinatra::Base
     @aryPostTitle = []
     @aryShortPost = []
     @aryUpdateDate = []
-
     @aryTagNames = []
     @aryTagUrls = []
 
@@ -67,15 +79,15 @@ class MainApp < Sinatra::Base
         strShortPost = strShortPost[0, POST_SHORT_LIMIT_SIZE - 1]
         strShortPost += "…"
       end
-      @aryShortPost.push(strShortPost)
-      @aryUpdateDate.push(post.updated_at)
+      @aryShortPost << strShortPost
+      @aryUpdateDate << post.updated_at
 
       aryTags = Tag.joins(:taglinks).select(:tag_name, :tag_id).where(taglinks: {post_id: post.post_id})
       aryTagName = []
       aryTagUrl = []
       aryTags.each do |tag|
-        aryTagName << tag.tag_name
         aryTagUrl << TAG_URL_DIR + tag.tag_id.to_s
+        aryTagName << tag.tag_name
       end
       @aryTagNames << aryTagName
       @aryTagUrls << aryTagUrl
@@ -84,9 +96,21 @@ class MainApp < Sinatra::Base
   def getRightColumnData()
     # 右カラムのデータを取得する.
     # 追加済みのタグを取得する.
-    @aryAllTags = Tag.all.order(tag_name: 'asc')
+    aryAllTags = Tag.all.order(tag_name: 'asc')
+    @aryAllTagUrl = []
+    @aryAllTagName = []
+    aryAllTags.each do |allTag|
+      @aryAllTagUrl << TAG_URL_DIR + allTag.tag_id.to_s
+      @aryAllTagName << allTag.tag_name
+    end
     # 最近の投稿から10件取得する.
-    @aryCurrentPosts = Post.select(:post_id, :post_title).order(updated_at: 'desc').limit(10)
+    aryCurrentPosts = Post.select(:post_id, :post_title).order(updated_at: 'desc').limit(CURRENT_POST_LIMIT_COUNT)
+    @aryCurrentPostUrl = []
+    @aryCurrentPostTitle = []
+    aryCurrentPosts.each do |currentPost|
+      @aryCurrentPostUrl << POST_URL_DIR + currentPost.post_id.to_s
+      @aryCurrentPostTitle << currentPost.post_title
+    end
   end
   def getPagerCount(postCount)
     # ページャー数を取得する.

@@ -13,13 +13,11 @@ html
     article.side
       ul#side_linklist
         li#side_linktitle タグ
-        - @aryAllTags.each do |allTag|
-          - tagUrl = "/tag/" + allTag.tag_id.to_s
+        - for i in 0..@aryAllTagName.count - 1
           li
-            a#side_link href=tagUrl =allTag.tag_name
+            a#side_link href==@aryAllTagUrl[i] =@aryAllTagName[i]
       ul#side_linklist
         li#side_linktitle 最近の投稿
-        - @aryCurrentPosts.each do |currentPost|
-          - articleUrl = "/article/" + currentPost.post_id.to_s
+        - for i in 0..@aryCurrentPostTitle.count - 1
           li
-            a#side_link href=articleUrl =currentPost.post_title
+            a#side_link href==@aryCurrentPostUrl[i] =@aryCurrentPostTitle[i]
