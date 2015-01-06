@@ -31,12 +31,31 @@ class MainApp < Sinatra::Base
   end
   get '/article/:name' do
     # 記事IDからタイトルなどを検索し、詳細ページに表示する.
-    aryArticle = Post.where(post_id: params[:name])
-    aryArticle.each do |article|
-      @strTitle = article.post_title
-      @strPost = article.post
-      @datUpdateDate = article.updated_at
+    aryArticle = Post.where(post_id: params[:name]).first
+    @strTitle = aryArticle.post_title
+    @strPost = aryArticle.post
+    @datUpdateDate = aryArticle.updated_at
+
+    conditions = Post.arel_table
+    # 一つ前の記事のURL、タイトルを取得する.
+    aryPrevious = Post.where(conditions[:post_id].lt(params[:name])).last
+    if aryPrevious == nil
+      @strPreviousUrl = ""
+      @strPreviousTitle = ""
+    else
+      @strPreviousUrl = POST_URL_DIR + aryPrevious.post_id.to_s
+      @strPreviousTitle = "< " + aryPrevious.post_title
     end
+    # 一つ後の記事のURL、タイトルを取得する.
+    aryNext = Post.where(conditions[:post_id].gt(params[:name])).first
+    if aryNext == nil
+      @strNextUrl = ""
+      @strNextTitle = ""
+    else
+      @strNextUrl = POST_URL_DIR + aryNext.post_id.to_s
+      @strNextTitle = aryNext.post_title + " >"
+    end
+
     @aryTagUrl = []
     @aryTagName = []
     aryTags = Tag.joins(:taglinks).select(:tag_name, :post_id, :tag_id).where(taglinks: {post_id: params[:name]})
@@ -126,7 +145,7 @@ class MainApp < Sinatra::Base
       @aryAllTagName << allTag.tag_name
     end
     # 最近の投稿から10件取得する.
-    aryCurrentPosts = Post.select(:post_id, :post_title).order(updated_at: 'desc').limit(CURRENT_POST_LIMIT_COUNT)
+    aryCurrentPosts = Post.select(:post_id, :post_title).order(post_id: 'desc').limit(CURRENT_POST_LIMIT_COUNT)
     @aryCurrentPostUrl = []
     @aryCurrentPostTitle = []
     aryCurrentPosts.each do |currentPost|
