@@ -5,6 +5,10 @@ require 'sinatra/base'
 require 'sinatra/reloader'
 require 'slim'
 
+require 'will_paginate'
+require 'will_paginate/active_record'
+require 'will_paginate/view_helpers/sinatra'
+
 require './models/dbAccessers'
 
 # TODO:テスト用に5件1ページで表示中。分量的にはこのままでもいいかも？
@@ -17,13 +21,16 @@ SITE_URL = 'http://localhost:9292'
 RSS_LIMIT_SIZE = 10
 
 class MainApp < Sinatra::Base
+  # viewでwill_pagenateを使用するのに必要.
+  helpers WillPaginate::Sinatra::Helpers
 
   intPageOffsetNum = 0
 
   get '/' do
     intPageOffsetNum = getPageOffset(params[:page])
 
-    getPagerCount(Post.count)
+    @pager = Post.paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
+
     aryPosts = Post.all.order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
     getShortPosts(aryPosts)
     getRightColumnData
@@ -34,6 +41,7 @@ class MainApp < Sinatra::Base
     aryArticle = Post.where(post_id: params[:name]).first
     @strTitle = aryArticle.post_title
     @strPost = aryArticle.post
+
     @datUpdateDate = aryArticle.updated_at
 
     conditions = Post.arel_table
@@ -69,8 +77,8 @@ class MainApp < Sinatra::Base
   get '/tag/:name' do
     intPageOffsetNum = getPageOffset(params[:page])
 
+    @pager = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
     aryPosts = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
-    getPagerCount(aryPosts.count)
     getShortPosts(aryPosts)
     getRightColumnData
     slim :blog
@@ -151,16 +159,6 @@ class MainApp < Sinatra::Base
     aryCurrentPosts.each do |currentPost|
       @aryCurrentPostUrl << POST_URL_DIR + currentPost.post_id.to_s
       @aryCurrentPostTitle << currentPost.post_title
-    end
-  end
-  def getPagerCount(postCount)
-    # ページャー数を取得する.
-    @intPagerCount = (postCount.to_f / POST_LIMIT_COUNT.to_f).ceil
-
-    if @intPagerCount <= 1
-      @isPagerEnable = false
-    else
-      @isPagerEnable = true
     end
   end
   def getPageOffset(pageNum)

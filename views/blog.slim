@@ -10,12 +10,4 @@ main
     article#main_body =@aryShortPost[i]
     article#main_updatedate = @aryUpdateDate[i]
 
-  article#main_pagerframe
-    - intPagerNum = 1
-    - if @isPagerEnable
-      - @intPagerCount.times do
-        - pageurl = "?page=" + intPagerNum.to_s
-        a#main_pager href=pageurl =intPagerNum
-        - intPagerNum += 1
-    - else
-      a#main_pager =intPagerNum
+  article#main_pager == will_paginate @pager, :previous_label=>'«前', :next_label=>'次»'
