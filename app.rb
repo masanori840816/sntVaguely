@@ -24,15 +24,14 @@ class MainApp < Sinatra::Base
   # viewでwill_pagenateを使用するのに必要.
   helpers WillPaginate::Sinatra::Helpers
 
-  intPageOffsetNum = 0
+  configure :development do
+    register Sinatra::Reloader
+  end
 
   get '/' do
     intPageOffsetNum = getPageOffset(params[:page])
-
-    @pager = Post.paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
-
-    aryPosts = Post.all.order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
-    getShortPosts(aryPosts)
+    @pager = Post.order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
+    getShortPosts(@pager)
     getRightColumnData
     slim :blog
   end
@@ -44,9 +43,9 @@ class MainApp < Sinatra::Base
 
     @datUpdateDate = aryArticle.updated_at
 
-    conditions = Post.arel_table
+    searchCriteria = Post.arel_table
     # 一つ前の記事のURL、タイトルを取得する.
-    aryPrevious = Post.where(conditions[:post_id].lt(params[:name])).last
+    aryPrevious = Post.where(searchCriteria[:post_id].lt(params[:name])).last
     if aryPrevious == nil
       @strPreviousUrl = ""
       @strPreviousTitle = ""
@@ -55,7 +54,7 @@ class MainApp < Sinatra::Base
       @strPreviousTitle = "< " + aryPrevious.post_title
     end
     # 一つ後の記事のURL、タイトルを取得する.
-    aryNext = Post.where(conditions[:post_id].gt(params[:name])).first
+    aryNext = Post.where(searchCriteria[:post_id].gt(params[:name])).first
     if aryNext == nil
       @strNextUrl = ""
       @strNextTitle = ""
@@ -77,9 +76,8 @@ class MainApp < Sinatra::Base
   get '/tag/:name' do
     intPageOffsetNum = getPageOffset(params[:page])
 
-    @pager = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
-    aryPosts = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc').limit(POST_LIMIT_COUNT).offset(intPageOffsetNum)
-    getShortPosts(aryPosts)
+    @pager = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
+    getShortPosts(@pager)
     getRightColumnData
     slim :blog
   end
@@ -112,7 +110,6 @@ class MainApp < Sinatra::Base
   end
   def getShortPosts(aryPosts)
     # 記事一覧表示用の投稿データを取得する.
-    @intCount = aryPosts.count - 1
     @aryPostUrl = []
     @aryPostTitle = []
     @aryShortPost = []
@@ -141,6 +138,8 @@ class MainApp < Sinatra::Base
       @aryTagNames << aryTagName
       @aryTagUrls << aryTagUrl
     end
+    # 記事数を取得する.
+    @intCount = @aryPostTitle.size - 1
   end
   def getRightColumnData()
     # 右カラムのデータを取得する.

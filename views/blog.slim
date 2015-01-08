@@ -7,7 +7,7 @@ main
       - for t in 0..@aryTagNames[i].count - 1
         a#main_tag href==@aryTagUrls[i][t] =@aryTagNames[i][t]
 
-    article#main_body =@aryShortPost[i]
+    article#main_body ==slim(@aryShortPost[i])
     article#main_updatedate = @aryUpdateDate[i]
 
-  article#main_pager == will_paginate @pager, :previous_label=>'«前', :next_label=>'次»'
+  article#main_pager == will_paginate @pager, inner_window: 3, :previous_label=>'＜前', :next_label=>'次＞'
