@@ -29,7 +29,6 @@ class MainApp < Sinatra::Base
   end
 
   get '/' do
-    intPageOffsetNum = getPageOffset(params[:page])
     @pager = Post.order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
     getShortPosts(@pager)
     getRightColumnData
@@ -74,9 +73,18 @@ class MainApp < Sinatra::Base
     slim :article
   end
   get '/tag/:name' do
-    intPageOffsetNum = getPageOffset(params[:page])
-
     @pager = Post.joins(:taglinks).where(taglinks: {tag_id: params[:name]}).order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
+    getShortPosts(@pager)
+    getRightColumnData
+    slim :blog
+  end
+  get '/search' do
+    strQuery = params[:q]
+    strQuery = "%" + strQuery + "%"
+
+    searchCriteria = Post.arel_table
+    # 入力されたクエリがタイトルor本文に合致していたら取得
+    @pager = Post.includes(:taglinks).where(searchCriteria[:post_title].matches(strQuery).or(searchCriteria[:post].matches(strQuery))).order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
     getShortPosts(@pager)
     getRightColumnData
     slim :blog
@@ -158,14 +166,6 @@ class MainApp < Sinatra::Base
     aryCurrentPosts.each do |currentPost|
       @aryCurrentPostUrl << POST_URL_DIR + currentPost.post_id.to_s
       @aryCurrentPostTitle << currentPost.post_title
-    end
-  end
-  def getPageOffset(pageNum)
-    # 遷移したページ数に合致した記事を表示するための、オフセット値を取得する.
-    if (pageNum == nil)||(pageNum.to_i == 1)
-      intPageOffsetNum = 0
-    else
-      intPageOffsetNum = (pageNum.to_i - 1) * POST_LIMIT_COUNT
     end
   end
 end

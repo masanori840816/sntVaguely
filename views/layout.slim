@@ -11,6 +11,10 @@ html
     == yield
 
     article.side
+      form action='/search' method='GET'
+        input type='text' name='q'
+        input.btn type="submit" value="検索"
+
       ul#side_linklist
         li#side_linktitle タグ
         - for i in 0..@aryAllTagName.count - 1
