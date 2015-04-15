@@ -1,0 +1,21 @@
+DOCTYPE
+html lang='ja' ng-app='NewPostApp'
+  head
+    meta charset='utf-8'
+    title Add New Post
+    link href='/css/stylesheet.css' rel='stylesheet'
+  body
+    header
+      a.header_title href='/' Vaguely
+    body
+      main#new ng-controller='NewPostCtrl'
+        form ng-submit='addPost()'
+          input#new_title type='text' placeholder='タイトルを入力' ng-model='postTitle'
+          textarea#new_article placeholder='本文を入力' ng-model='postArticle'
+          input#new_category type='text' ng-model='postCategory'
+          div ng-bind='postCategory'
+          input#new_btn_submit type='submit' value='投稿'
+          input#new_cancel type='reset' value='キャンセル'
+
+      script src='/js/angular.min.js'
+      script src='/js/addnewpost.js'

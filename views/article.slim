@@ -1,9 +1,0 @@
-main
-  article#main_titleframe = @strTitle
-  article#main_tagframe
-    - for i in 0..@aryTagName.count - 1
-      a#main_tag href==@aryTagUrl[i] =@aryTagName[i]
-  article#main_body ==slim(@strPost)
-  article#main_updatedate =@datUpdateDate
-  a#main_previous href==@strPreviousUrl =@strPreviousTitle
-  a#main_next href==@strNextUrl =@strNextTitle

@@ -1,3 +1,4 @@
+require 'json'
 require 'rss/maker'
 require 'sass'
 require 'sinatra'
@@ -11,17 +12,13 @@ require 'will_paginate/view_helpers/sinatra'
 
 require './models/dbAccessers'
 
-# TODO:テスト用に5件1ページで表示中。分量的にはこのままでもいいかも？
-POST_LIMIT_COUNT = 5
-POST_URL_DIR = "/article/"
 TAG_URL_DIR = "/tag/"
 POST_SHORT_LIMIT_SIZE = 300
 CURRENT_POST_LIMIT_COUNT = 10
 SITE_URL = 'http://localhost:9292'
-RSS_LIMIT_SIZE = 10
 
 class MainApp < Sinatra::Base
-  # viewでwill_pagenateを使用するのに必要.
+  # for using will_pagenate.
   helpers WillPaginate::Sinatra::Helpers
 
   configure :development do
@@ -29,10 +26,42 @@ class MainApp < Sinatra::Base
   end
 
   get '/' do
-    @pager = Post.order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
-    getShortPosts(@pager)
-    getRightColumnData
-    slim :blog
+    #@pager = Post.order(post_id: 'desc').paginate(:page => params[:page], :per_page => POST_LIMIT_COUNT)
+    #getShortPosts(@pager)
+    #getRightColumnData
+    slim :post
+  end
+  get '/list' do
+    # get blog posts and return json data.
+    intStartNum = (params[:page] =~ /\d+/ && params[:page].to_i > 0)? params[:page].to_i: 1
+
+    aryBlogList = Post.order(post_id: 'desc').paginate(:page => intStartNum, :per_page => 5)
+    aryJsonList = []
+
+    aryCategoryTest = [{:title =>'category1', :url => '/tag/1'},
+        {:title => 'category2', :url => '/tag/2'}]
+
+    aryBlogList.each do |post|
+      aryJsonList << {
+        postUrl: '/article/' + post.post_id.to_s,
+        postTitle: post.post_title,
+        post: post.post,
+        category: aryCategoryTest,
+        updateDate: post.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      }
+    end
+    aryJsonList.to_json
+  end
+  not_found do
+    slim :error
+  end
+  get '/newpost' do
+    slim :newpost
+  end
+  post '/create' do
+    jsnParams = ActiveSupport::JSON.decode(request.body.read)
+    print jsnParams['title']
+    print jsnParams['article']
   end
   get '/article/:name' do
     # 記事IDからタイトルなどを検索し、詳細ページに表示する.
@@ -101,9 +130,9 @@ class MainApp < Sinatra::Base
       newRss.channel.language = "ja"
 
       newRss.items.do_sort = true
-      newRss.items.max_size = RSS_LIMIT_SIZE
+      newRss.items.max_size = 10
 
-      aryPosts = Post.all.order(post_id: 'desc').limit(RSS_LIMIT_SIZE)
+      aryPosts = Post.all.order(post_id: 'desc').limit(10)
       aryPosts.each do |post|
         rssItem = newRss.items.new_item
         rssItem.title = post.post_title
