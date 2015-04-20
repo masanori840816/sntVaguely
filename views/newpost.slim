@@ -10,9 +10,10 @@ html lang='ja' ng-app='NewPostApp'
     body
       main#new ng-controller='NewPostCtrl'
         form ng-submit='addPost()'
-          input#new_title type='text' placeholder='タイトルを入力' ng-model='postTitle'
-          textarea#new_article placeholder='本文を入力' ng-model='postArticle'
-          input#new_category type='text' ng-model='postCategory'
+          input#new_title type='text' placeholder='タイトルを入力' ng-model='postTitle' required='true'
+          textarea#new_article placeholder='本文を入力' ng-model='postArticle' required='true'
+          input#new_category type='text' ng-model='postNewCategory'
+
           div ng-bind='postCategory'
           input#new_btn_submit type='submit' value='投稿'
           input#new_cancel type='reset' value='キャンセル'

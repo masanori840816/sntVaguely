@@ -38,15 +38,15 @@ class MainApp < Sinatra::Base
     aryBlogList = Post.order(post_id: 'desc').paginate(:page => intStartNum, :per_page => 5)
     aryJsonList = []
 
-    aryCategoryTest = [{:title =>'category1', :url => '/tag/1'},
-        {:title => 'category2', :url => '/tag/2'}]
+    aryTagTest = [{:title =>'tag1', :url => '/tag/1'},
+        {:title => 'tag2', :url => '/tag/2'}]
 
     aryBlogList.each do |post|
       aryJsonList << {
         postUrl: '/article/' + post.post_id.to_s,
         postTitle: post.post_title,
         post: post.post,
-        category: aryCategoryTest,
+        category: aryTagTest,
         updateDate: post.updated_at.strftime('%Y-%m-%d %H:%M:%S')
       }
     end
@@ -62,6 +62,19 @@ class MainApp < Sinatra::Base
     jsnParams = ActiveSupport::JSON.decode(request.body.read)
     print jsnParams['title']
     print jsnParams['article']
+  end
+  get '/gettaglist' do
+    aryTagList = Tag.order(tag_id: 'desc')
+
+    aryJsonList = []
+
+    aryTagList.each do |tag|
+      aryJsonList << {
+        tagid: tag.tag_id,
+        tagname: tag.tag_name
+      }
+    end
+    aryJsonList.to_json
   end
   get '/article/:name' do
     # 記事IDからタイトルなどを検索し、詳細ページに表示する.
