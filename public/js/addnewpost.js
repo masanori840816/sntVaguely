@@ -1,34 +1,48 @@
 (function () {
   // Angularモジュールを作成する.
-  var newPostApp = angular.module('NewPostApp', []);
+  var newPostApp = angular.module('NewPostApp', ['ngResource']);
+  newPostApp.factory('TagList', ['$resource', function($resource)
+  {
+    return $resource('/gettaglist', {}, {
+      get: {method: 'GET', cache: true, isArray: true},
+      save: {method: 'POST', cache: false, isArray: false}
+    });
+  }]);
 
-  // コントローラーの作成.scope、httpを引数とする.
+  // コントローラーの作成.
   newPostApp.controller('NewPostCtrl',[
-    '$scope', '$http',
-    function($scope ,$http) {
+    '$scope', '$http', 'TagList',
+    function($scope ,$http, TagList) {
+      // 既存のタグを取得.
       $scope.getTagLists = function()
       {
-        // カテゴリ情報をセットする.
-        $http({method: 'GET', url: '/gettaglist'}).
-          success(function(data){
-            console.log(data[0].tagname);
-          }).
-          error(function(data, status, headers, config) {
-            console.log('fail');
+        TagList.get({},
+          function success(data){
+            $scope.existedTags = data;
+          },
+          function error(data){
+            alert('error ' + data);
           });
       };
       $scope.addPost = function()
       {
-        // Postでデータを送信する(タイトル、記事本文をJSONとして送信).
-        $http.post('/create', {title: $scope.postTitle, article: $scope.postArticle}).
+        var postTags = [];
+        // チェックされたタグのIDを配列に追加する.
+        angular.forEach($scope.existedTags, function(existedTag)
+        {
+          if(existedTag.checked)
+          {
+            postTags.push(existedTag.tagid);
+          }
+        });
+        // Postでデータを送信する(タイトル、記事本文、タグIDをJSONとして送信).
+        $http.post('/createnewpost', {title: $scope.postTitle, article: $scope.postArticle, tags: postTags}).
             success(function(data){
               console.log('success');
             }).
             error(function(data, status, headers, config) {
               console.log('fail');
             });
-        // タイトルのテキストボックスを空にする.
-        $scope.postTitle = '';
       };
       // ページロード時にカテゴリ情報を取得.
       $scope.getTagLists();
